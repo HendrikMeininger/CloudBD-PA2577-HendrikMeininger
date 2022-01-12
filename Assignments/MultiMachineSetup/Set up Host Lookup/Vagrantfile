@@ -1,0 +1,30 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-18.04"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    wget https://apt.puppetlabs.com/puppet5-release-$(lsb_release -cs).deb
+    dpkg -i puppet5-release-$(lsb_release -cs).deb
+    apt-get -qq update
+    apt-get install -y puppet-agent
+  SHELL
+
+  config.vm.define "server1" do |server1|
+    server1.vm.hostname = "server1"
+    server1.vm.network "private_network", type: "dhcp"
+  end
+
+  config.vm.define "server2" do |server2|
+    server2.vm.hostname = "server2"
+    server2.vm.network "private_network", type: "dhcp"
+  end
+  
+  config.vm.define "server3" do |server3|
+    server3.vm.hostname = "server3"
+    server3.vm.network "private_network", type: "dhcp"
+  end
+
+  config.vm.provision "puppet" do |puppet|
+    puppet.manifests_path = "./manifests"
+    puppet.manifest_file = "default.pp"
+  end
+end
